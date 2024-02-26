@@ -1,0 +1,645 @@
+{
+	"info": {
+		"_postman_id": "efb8cedc-50e9-478b-8f14-073920cd4654",
+		"name": "Marzia_API_Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "29102056"
+	},
+	"item": [
+		{
+			"name": "CreateBooking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json()\r",
+							"\r",
+							"pm.environment.set(\"id\",jsonData.bookingid)\r",
+							"var jsonData = pm.response.json()\r",
+							"\r",
+							"pm.environment.set(\"accesstoken\",jsonData.token)\r",
+							"\r",
+							"var code = pm.response.code\r",
+							" console.log (code)\r",
+							"\r",
+							" if(code==200){\r",
+							"   pm.test(\"Status code 200 is valid\")\r",
+							"}else if( code==401){\r",
+							"\r",
+							"    pm.test(\"Unathorized\")\r",
+							" }\r",
+							"  else if( code==403){\r",
+							"\r",
+							"    pm.test(\"Forbidden\")\r",
+							" }\r",
+							"  else if( code==404){\r",
+							"\r",
+							"    pm.test(\"Not Found\")\r",
+							" }\r",
+							" \r",
+							" else if( code==405){\r",
+							"\r",
+							"    pm.test(\"Method not allowed\")\r",
+							" }\r",
+							"\r",
+							" else if( code==502){\r",
+							"\r",
+							"    pm.test(\"Bad Gateway\")\r",
+							" }\r",
+							" else {\r",
+							"    pm.test(\"something is wrong\")\r",
+							" }\r",
+							"\r",
+							" \r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var firstName = pm.variables .replaceIn(\"{{$randomFirstName}}\")\r",
+							"console.log(\"firstName is:\"+firstName)\r",
+							"pm.environment.set(\"firstName\",firstName)\r",
+							"\r",
+							"var  lastName = pm.variables .replaceIn(\"{{$randomLastName}}\")\r",
+							"console.log(\"lastName is:\"+ lastName)\r",
+							"pm.environment.set(\"lastName\", lastName)\r",
+							"\r",
+							"var totalprice = pm.variables .replaceIn(\"{{$randomPrice}}\")\r",
+							"console.log(\"Total Price:\"+ totalprice)\r",
+							"pm.environment.set(\"totalprice\", totalprice)\r",
+							"\r",
+							"var depositPaid = pm.variables .replaceIn(\"{{$randomBoolean}}\")\r",
+							"console.log(\"Deposit Paid:\"+ depositPaid)\r",
+							"pm.environment.set(\"depositPaid\", depositPaid)\r",
+							"\r",
+							"const date = require('moment')\r",
+							"const today = date()\r",
+							"//console.log(today .format(\"DD-MM-YYYY\"))\r",
+							"//console.log(today . add( 2,'d').add(3,'M').format(\"DD-MM-YYYY\"))\r",
+							"//console.log(today . subtract( 5,'d').add(3,'M').format(\"DD-MM-YYYY\"))\r",
+							"\r",
+							"let number= Math.random()*10\r",
+							"var checkIn= today.add(number,'d').format(\"YYYY-MM-DD\")\r",
+							"console.log(\"checkinDate: \" + checkIn)\r",
+							"pm.environment.set(\"checkin\",checkIn)\r",
+							"\r",
+							"\r",
+							"let number1= Math.random()*10\r",
+							"var checkout= today.add(number1,'d').add(number1,'d').add(number1,'M').format(\"YYYY-MM-DD\")\r",
+							"console.log(\"checkoutDate: \" + checkout)\r",
+							"pm.environment.set(\"checkout\", checkout)\r",
+							"\r",
+							"var additionalneeds= pm.variables .replaceIn(\"{{$randomProduct}}\")\r",
+							"console.log(\" additionalNeeds:\"+ additionalneeds)\r",
+							"pm.environment.set(\"additionalneeds\", additionalneeds )\r",
+							"\r",
+							" \r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"firstname\" : \"{{firstName}}\",\r\n\t\"lastname\" : \"{{lastName}}\",\r\n\t\"totalprice\" : \"{{totalprice}}\",\r\n\t\"depositpaid\" : \"{{depositPaid}}\",\r\n\t\"bookingdates\" : {\r\n    \t\"checkin\" : \"{{checkin}}\",\r\n    \t\"checkout\" : \"{{checkout}}\"\r\n\t},\r\n\t\"additionalneeds\" : \"{{additionalneeds}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/booking/"
+			},
+			"response": []
+		},
+		{
+			"name": "getBooking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var statuscode = pm.response.code\r",
+							"  console.log(statuscode)\r",
+							" \r",
+							"switch(statuscode){\r",
+							"\r",
+							"    case 200: \r",
+							"    pm.test(\"Status code ok\")\r",
+							" var jsonData = pm.response.json()\r",
+							"    pm.test(\"First name validation\", function(){\r",
+							"  pm.expect(pm.environment.get(\"firstname\")) .to .eql(jsonData.firstName)\r",
+							"\r",
+							"  });\r",
+							"   pm.test(\"Last name validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"lastname\")) .to .eql(jsonData.lastName)\r",
+							"});\r",
+							"  pm.test(\"Totalprice validation\", function(){\r",
+							"    pm.expect(parseInt(pm.environment.get(\"totalprice\"))) .to .eql(jsonData.totalprice)\r",
+							"\r",
+							"  });\r",
+							"   pm.test(\"DepositPaid validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"depositPaid\")).to.eql(jsonData.depositpaid.toString())\r",
+							"\r",
+							"  });\r",
+							"    pm.test(\"Checkin validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"checkin\")) .to .eql(jsonData.bookingdates.checkin)\r",
+							"\r",
+							"  });\r",
+							"   pm.test(\"Checkout validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"checkout\")) .to .eql(jsonData.bookingdates.checkout)\r",
+							"\r",
+							"  });\r",
+							"\r",
+							"  pm.test(\"Additionalneeds validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"additionalneeds\")).to .eql(jsonData.additionalneeds)\r",
+							"\r",
+							"});\r",
+							"    break;\r",
+							"\r",
+							"\r",
+							"    case 404:\r",
+							"          pm.test(\"Not Found\")\r",
+							"    break;\r",
+							"\r",
+							"      case 400:\r",
+							"          pm.test(\"Bad Request\")\r",
+							"    break;\r",
+							"      case 500:\r",
+							"          pm.test(\"Internal Server error\")\r",
+							"    break;\r",
+							" }\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/booking/{{id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "tokenget",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json()\r",
+							"\r",
+							"pm.environment.set(\"accesstoken\",jsonData.token)\r",
+							"\r",
+							"var code = pm.response.code\r",
+							" console.log (code)\r",
+							"\r",
+							" if(code==200){\r",
+							"   pm.test(\"Status code 200 is valid\")\r",
+							"}else if( code==401){\r",
+							"\r",
+							"    pm.test(\"Unathorized\")\r",
+							" }\r",
+							"  else if( code==403){\r",
+							"\r",
+							"    pm.test(\"Forbidden\")\r",
+							" }\r",
+							"  else if( code==404){\r",
+							"\r",
+							"    pm.test(\"Not Found\")\r",
+							" }\r",
+							" \r",
+							" else if( code==405){\r",
+							"\r",
+							"    pm.test(\"Method not allowed\")\r",
+							" }\r",
+							"\r",
+							" else if( code==502){\r",
+							"\r",
+							"    pm.test(\"Bad Gateway\")\r",
+							" }\r",
+							" else {\r",
+							"    pm.test(\"something is wrong\")\r",
+							" }\r",
+							"\r",
+							" \r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"username\": \"admin\",\r\n\t\"password\": \"password123\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/auth"
+			},
+			"response": []
+		},
+		{
+			"name": "updateBooking",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var firstName = pm.variables .replaceIn(\"{{$randomFirstName}}\")\r",
+							"console.log(\"firstName is:\"+firstName)\r",
+							"pm.environment.set(\"firstName\",firstName)\r",
+							"\r",
+							"var  lastName = pm.variables .replaceIn(\"{{$randomLastName}}\")\r",
+							"console.log(\"lastName is:\"+ lastName)\r",
+							"pm.environment.set(\"lastName\", lastName)\r",
+							"\r",
+							"var totalprice = pm.variables .replaceIn(\"{{$randomPrice}}\")\r",
+							"console.log(\"Total Price:\"+ totalprice)\r",
+							"pm.environment.set(\"totalprice\", totalprice)\r",
+							"\r",
+							"var depositPaid = pm.variables .replaceIn(\"{{$randomBoolean}}\")\r",
+							"console.log(\"Deposit Paid:\"+ depositPaid)\r",
+							"pm.environment.set(\"depositPaid\", depositPaid)\r",
+							"\r",
+							"const date = require('moment')\r",
+							"const today = date()\r",
+							"//console.log(today .format(\"DD-MM-YYYY\"))\r",
+							"//console.log(today . add( 2,'d').add(3,'M').format(\"DD-MM-YYYY\"))\r",
+							"//console.log(today . subtract( 5,'d').add(3,'M').format(\"DD-MM-YYYY\"))\r",
+							"\r",
+							"let number= Math.random()*10\r",
+							"var checkin= today.add(number,'d').format(\"YYYY-MM-DD\")\r",
+							"console.log(\"checkinDate: \" + checkin)\r",
+							"pm.environment.set(\"checkin\", checkin)\r",
+							"\r",
+							"\r",
+							"var checkout= today.add(number,'d').add(number,'d').add(number,'M').format(\"YYYY-MM-DD\")\r",
+							"console.log(\"checkoutDate: \" + checkout)\r",
+							"pm.environment.set(\"checkout\", checkout)\r",
+							"\r",
+							"var additionalneeds= pm.variables .replaceIn(\"{{$randomProduct}}\")\r",
+							"console.log(\" additionalNeeds:\"+ additionalneeds)\r",
+							"pm.environment.set(\"additionalneeds\",additionalneeds )\r",
+							"\r",
+							" \r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var code = pm.response.code\r",
+							" console.log (code)\r",
+							"\r",
+							" if(code==200){\r",
+							"   pm.test(\"Status code 200 is valid\")\r",
+							"}else if( code==401){\r",
+							"\r",
+							"    pm.test(\"Unathorized\")\r",
+							" }\r",
+							"  else if( code==403){\r",
+							"\r",
+							"    pm.test(\"Forbidden\")\r",
+							" }\r",
+							"  else if( code==404){\r",
+							"\r",
+							"    pm.test(\"Not Found\")\r",
+							" }\r",
+							" \r",
+							" else if( code==405){\r",
+							"\r",
+							"    pm.test(\"Method not allowed\")\r",
+							" }\r",
+							"\r",
+							" else if( code==502){\r",
+							"\r",
+							"    pm.test(\"Bad Gateway\")\r",
+							" }\r",
+							" else {\r",
+							"    pm.test(\"something is wrong\")\r",
+							" }\r",
+							"\r",
+							" \r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token={{accesstoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"firstname\" : \"{{firstName}}\",\r\n\t\"lastname\" : \"{{lastName}}\",\r\n\t\"totalprice\" : \"{{totalprice}}\",\r\n\t\"depositpaid\" : \"{{epositPaid}}\",\r\n\t\"bookingdates\" : {\r\n    \t\"checkin\" : \"{{checkin}}\",\r\n    \t\"checkout\" : \"{{checkout}}\"\r\n\t},\r\n\t\"additionalneeds\" : \"{{additionalneeds}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/booking/{{id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "verify_after_updateBooking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							" \r",
+							" var code = pm.response.code\r",
+							" console.log (code)\r",
+							"\r",
+							" if(code==200){\r",
+							"\r",
+							"    pm.test(\"Status code 200 is valid\")\r",
+							"\r",
+							"    var jsonData = pm.response.json()\r",
+							"\r",
+							"\r",
+							"  pm.test(\"Firstname  update validation\", function(){\r",
+							"  pm.expect(pm.environment.get(\"firstname\")) .to .eql(jsonData.firstName)\r",
+							"\r",
+							"  });\r",
+							"   pm.test(\"Lastname  update validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"lastname\")) .to .eql(jsonData.lastName)\r",
+							"\r",
+							"  });\r",
+							"\r",
+							"  pm.test(\"Totalprice update validation\", function(){\r",
+							"     pm.expect(parseInt(pm.environment.get(\"totalprice\"))) .to .eql(jsonData.totalprice)\r",
+							"  });\r",
+							"   pm.test(\"DepositPaid update validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"deposiPaid\")) .to .eql(jsonData.depositPaid)\r",
+							"\r",
+							"  });\r",
+							"    pm.test(\"Checkin  update validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"checkin\")) .to .eql(jsonData.bookingdates.checkin)\r",
+							"\r",
+							"  });\r",
+							"   pm.test(\"Checkout update validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"checkout\")) .to .eql(jsonData.bookingdates.checkout)\r",
+							"\r",
+							"  });\r",
+							"\r",
+							"  pm.test(\"Additionalneeds  update validation\", function(){\r",
+							"    pm.expect(pm.environment.get(\"additionalneeds\")).to .eql(jsonData. additionalneeds)\r",
+							"\r",
+							"});\r",
+							"\r",
+							" }else if( code==401){\r",
+							"\r",
+							"    pm.test(\"Unathorized\")\r",
+							" }\r",
+							"  else if( code==403){\r",
+							"\r",
+							"    pm.test(\"Forbidden\")\r",
+							" }\r",
+							" else if( code==404){\r",
+							"\r",
+							"    pm.test(\"Not Found\")\r",
+							" }\r",
+							" \r",
+							" else if( code==405){\r",
+							"\r",
+							"    pm.test(\"Method not allowed\")\r",
+							" }\r",
+							"\r",
+							" else if( code==502){\r",
+							"\r",
+							"    pm.test(\"Bad Gateway\")\r",
+							" }\r",
+							" else {\r",
+							"    pm.test(\"something is wrong\")\r",
+							" }\r",
+							"\r",
+							" \r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/booking/{{id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "deleteBooking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var code = pm.response.code\r",
+							" console.log (code)\r",
+							"\r",
+							" if(code==200){\r",
+							"   pm.test(\"Status code 200 is valid\")\r",
+							"}else if( code==401){\r",
+							"\r",
+							"    pm.test(\"Unathorized\")\r",
+							" }\r",
+							"else if( code==201){\r",
+							"\r",
+							"    pm.test(\"Created\")\r",
+							" }\r",
+							"  else if( code==403){\r",
+							"\r",
+							"    pm.test(\"Forbidden\")\r",
+							" }\r",
+							"  else if( code==404){\r",
+							"\r",
+							"    pm.test(\"Not Found\")\r",
+							" }\r",
+							" \r",
+							" else if( code==405){\r",
+							"\r",
+							"    pm.test(\"Method not allowed\")\r",
+							" }\r",
+							"\r",
+							" else if( code==502){\r",
+							"\r",
+							"    pm.test(\"Bad Gateway\")\r",
+							" }\r",
+							" else {\r",
+							"    pm.test(\"something is wrong\")\r",
+							" }\r",
+							"\r",
+							" \r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token={{accesstoken}}",
+						"type": "text"
+					}
+				],
+				"url": "{{base_url}}/booking/{{id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "verify_after_deleteBooking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var code = pm.response.code\r",
+							" console.log (code)\r",
+							"\r",
+							" if(code==200){\r",
+							"   pm.test(\"Status code 200 is valid\")\r",
+							"}else if( code==401){\r",
+							"\r",
+							"    pm.test(\"Unathorized\")\r",
+							" }\r",
+							"else if( code==201){\r",
+							"\r",
+							"    pm.test(\"Created\")\r",
+							" }\r",
+							"  else if( code==403){\r",
+							"\r",
+							"    pm.test(\"Forbidden\")\r",
+							" }\r",
+							"  else if( code==404){\r",
+							"\r",
+							"    pm.test(\"Not Found\")\r",
+							" }\r",
+							" \r",
+							" else if( code==405){\r",
+							"\r",
+							"    pm.test(\"Method not allowed\")\r",
+							" }\r",
+							"\r",
+							" else if( code==502){\r",
+							"\r",
+							"    pm.test(\"Bad Gateway\")\r",
+							" }\r",
+							" else {\r",
+							"    pm.test(\"something is wrong\")\r",
+							" }\r",
+							"\r",
+							" \r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							" \r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/booking/{{id}}"
+			},
+			"response": []
+		}
+	]
+}
